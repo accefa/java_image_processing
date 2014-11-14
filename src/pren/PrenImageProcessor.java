@@ -9,25 +9,41 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.imageio.ImageIO;
 
-public class PrenImageProcessor {
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-   private File file;
+public class PrenImageProcessor {
 
    private ImagePlus image;
 
+   private File destFolder;
+
+   private String executetOperations = "";
+
    public PrenImageProcessor(File file) {
       image = new ImagePlus(file.getAbsolutePath());
+
+      Date date = new Date();
+      SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+      destFolder = new File("output" + File.separator + formatter.format(date));
+      destFolder.mkdir();
    }
 
    public void saveImage(String name) {
-      this.file = new File("output" + File.separator + name + ".jpg");
+      File destFile = new File(destFolder.getAbsolutePath() + File.separator + name + ".jpg");
       try {
-         ImageIO.write(image.getBufferedImage(), "jpg", this.file);
+         ImageIO.write(image.getBufferedImage(), "jpg", destFile);
       } catch (IOException e) {
          e.printStackTrace();
       }
@@ -38,62 +54,91 @@ public class PrenImageProcessor {
       ip.setRoi(x, y, targetWidth, targetHeight);
       ip = ip.crop();
       image = new ImagePlus("croppedImage", ip);
+      executetOperations += "cropped x=" + " y=" + y + " width=" + targetWidth + " height=" + targetHeight + "; ";
    }
 
    public void contrastIt() {
       ContrastEnhancer enh = new ContrastEnhancer();
-      int i = 50; // i < 100
+      int i = 50; // i < 100 --> 50 guter Wert
       enh.stretchHistogram(image, i);
+      executetOperations += "contrast by " + i + "; ";
    }
 
    public void greyscaleIt() {
       ImageConverter converter = new ImageConverter(image);
       converter.convertToGray32();
+      executetOperations += "greyscaled32; ";
       // converter.convertToGray8();
       // converter.convertToHSB();
    }
 
-   public String readPixel(int x, int y) {
-      ImageProcessor imp = image.getProcessor();
-      int[] rgb = new int[3];
-      imp.getPixel(x, y, rgb);
-      return Arrays.toString(rgb);
+   public void drawHorizontalLine(int y) {
+      BufferedImage bi = this.image.getBufferedImage();
+      Graphics2D g2d = bi.createGraphics();
+      g2d.setBackground(Color.red);
+      g2d.setColor(Color.red);
+      g2d.drawLine(0, 300, bi.getWidth(), 300);
+      g2d.drawImage(bi, null, 0, 0);
+      this.image = new ImagePlus("test", bi);
+      executetOperations += "draw horizontal line y=" + y + "; ";
    }
 
-   public void alternatePixel() {
-      BufferedImage bi;
+   public void generateExcel(int y) {
+      File templateFile = new File("template" + File.separator + "template.xlsx");
+      File destFile = new File(destFolder.getAbsolutePath() + File.separator + "versuch.xlsx");
+      copyFileUsingStream(templateFile, destFile);
+
       try {
-         bi = ImageIO.read(this.file);
+         FileInputStream file = new FileInputStream(destFile);
+
+         // Get the workbook instance for XLS file
+         XSSFWorkbook workbook = new XSSFWorkbook(file);
+
+         // Get first sheet from the workbook
+         XSSFSheet sheet = workbook.getSheetAt(0);
+
+         XSSFRow rowt = sheet.createRow(0);
+         rowt.createCell(0).setCellValue(executetOperations);
+
+         BufferedImage bi = this.image.getBufferedImage();
          for (int x = 0; x < bi.getWidth(); x++) {
-            Color c = new Color(bi.getRGB(x, 300));
-            // System.out.println("red==" + c.getRed() + " green==" +
-            // c.getGreen() + "    blue==" + c.getBlue());
-            System.out.println(c.getGreen());
+            Color c = new Color(bi.getRGB(x, y));
+
+            XSSFRow row = sheet.createRow(x + 2);
+            row.createCell(0).setCellValue(c.getRed());
+            row.createCell(1).setCellValue(c.getRed());
+            row.createCell(2).setCellValue(c.getGreen());
          }
 
-         Graphics2D g2d = bi.createGraphics();
-         g2d.setBackground(Color.red);
-         g2d.setColor(Color.red);
-         g2d.drawLine(0, 300, bi.getWidth(), 300);
+         FileOutputStream fileOut = new FileOutputStream(destFile.getAbsolutePath());
+         workbook.write(fileOut);
+         fileOut.flush();
+         fileOut.close();
+         workbook.close();
 
-         g2d.drawImage(bi, null, 0, 0);
-         ImageIO.write(bi, "JPEG", new File("gogogo.jpg"));
-         // for (int x = 0; x < bi.getWidth(); x++) {
-         // for (int y = 0; y < bi.getHeight(); y++) {
-         // Color c = new Color(bi.getRGB(x, y));
-         // System.out.println("red==" + c.getRed() + " green==" + c.getGreen()
-         // + "    blue==" + c.getBlue());
-         // }
-         // }
-      } catch (IOException e) {
-         // TODO Auto-generated catch block
+      } catch (Exception e) {
          e.printStackTrace();
       }
 
    }
 
-   public int getPixelWidth() {
-      return image.getWidth();
-   }
+   private static void copyFileUsingStream(File source, File dest) {
+      InputStream is = null;
+      OutputStream os = null;
+      try {
+         is = new FileInputStream(source);
+         os = new FileOutputStream(dest);
+         byte[] buffer = new byte[1024];
+         int length;
+         while ((length = is.read(buffer)) > 0) {
+            os.write(buffer, 0, length);
+         }
+         is.close();
+         os.close();
+      } catch (IOException e) {
+         e.printStackTrace();
+      } finally {
 
+      }
+   }
 }

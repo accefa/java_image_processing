@@ -27,8 +27,14 @@ public class Main {
       processor.greyscaleIt();
       processor.saveImage("step3-greyscale");
 
-      // 4. Read Pixel
-      processor.alternatePixel();
+      // 4. Analyze Line
+      int line = 300;
+      processor.generateExcel(line);
+
+      // Mark analyzed line horizontal Line
+      processor.drawHorizontalLine(line);
+      processor.saveImage("step4-analyzed-line");
+
    }
 
 }
