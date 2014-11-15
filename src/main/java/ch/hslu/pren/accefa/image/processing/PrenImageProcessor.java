@@ -16,6 +16,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -106,7 +108,7 @@ public class PrenImageProcessor {
 
             XSSFRow row = sheet.createRow(x + 2);
             row.createCell(0).setCellValue(c.getRed());
-            row.createCell(1).setCellValue(c.getRed());
+            row.createCell(1).setCellValue(c.getBlue());
             row.createCell(2).setCellValue(c.getGreen());
          }
 
