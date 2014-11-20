@@ -22,12 +22,12 @@ public class Main {
       processor.crop(0, 290, 4000, 700);
       processor.saveImage("step10-crop");
 
-      processor.sharpen();
-      processor.saveImage("step12-sharpen");
+      // processor.sharpen();
+      // processor.saveImage("step12-sharpen");
 
       // saturation
-      processor.saturation();
-      processor.saveImage("step15-saturation");
+      // processor.saturation();
+      // processor.saveImage("step15-saturation");
 
       // 2. Kontrast
       processor.contrastIt();
