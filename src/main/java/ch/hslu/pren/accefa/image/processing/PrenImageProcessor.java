@@ -1,5 +1,6 @@
 package ch.hslu.pren.accefa.image.processing;
 
+import ij.IJ;
 import ij.ImagePlus;
 import ij.plugin.ContrastEnhancer;
 import ij.process.ImageConverter;
@@ -16,8 +17,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -66,9 +65,24 @@ public class PrenImageProcessor {
       executetOperations += "contrast by " + i + "; ";
    }
 
+   public void saturation() {
+      float saturation = 0.9f;
+      IJ.run(image, "Enhance Contrast", "saturated=" + saturation);
+      executetOperations += "saturated by " + saturation + "; ";
+
+   }
+
+   public void sharpen() {
+      ImageProcessor ip = image.getProcessor();
+      ip.sharpen();
+      image = new ImagePlus("sharpedImage", ip);
+      executetOperations += "sharpen" + "; ";
+   }
+
    public void greyscaleIt() {
       ImageConverter converter = new ImageConverter(image);
       converter.convertToGray32();
+      // converter.convertToGray8();
       executetOperations += "greyscaled32; ";
       // converter.convertToGray8();
       // converter.convertToHSB();

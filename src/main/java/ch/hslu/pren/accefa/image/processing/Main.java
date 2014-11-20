@@ -6,8 +6,8 @@ public class Main {
 
    public static void main(String[] args) {
 
-      WebCamera cam = new WebCamera();
-      cam.saveWebCame();
+      // WebCamera cam = new WebCamera();
+      // cam.saveWebCame();
 
       // String file1 = "korb-bg-white.jpg";
       String file2 = "korb-bg-yellow.jpg";
@@ -20,15 +20,22 @@ public class Main {
 
       // 1. Bild zuschneiden
       processor.crop(0, 290, 4000, 700);
-      processor.saveImage("step1-crop");
+      processor.saveImage("step10-crop");
+
+      processor.sharpen();
+      processor.saveImage("step12-sharpen");
+
+      // saturation
+      processor.saturation();
+      processor.saveImage("step15-saturation");
 
       // 2. Kontrast
       processor.contrastIt();
-      processor.saveImage("step2-contrast");
+      processor.saveImage("step20-contrast");
 
       // 3. Greyscale
       processor.greyscaleIt();
-      processor.saveImage("step3-greyscale");
+      processor.saveImage("step30-greyscale");
 
       // 4. Analyze Line
       int line = 300;
@@ -36,7 +43,7 @@ public class Main {
 
       // Mark analyzed line horizontal Line
       processor.drawHorizontalLine(line);
-      processor.saveImage("step4-analyzed-line");
+      processor.saveImage("step40-analyzed-line");
 
    }
 
