@@ -10,16 +10,18 @@ public class Main {
       // cam.saveWebCame();
 
       // String file1 = "korb-bg-white.jpg";
-      String file2 = "korb-bg-yellow.jpg";
+      // String file2 = "korb-bg-yellow.jpg";
+      String file3 = "greyscaleandcontrast_quality50_17_40.jpg";
 
-      String file = file2;
+      String file = file3;
 
       PrenImageProcessor processor = new PrenImageProcessor(new File("testdaten-roh/" + file));
 
       processor.saveImage("step0-plain");
 
       // 1. Bild zuschneiden
-      processor.crop(0, 290, 4000, 700);
+      // processor.crop(0, 290, 4000, 700);
+      processor.crop(200, 600, 4000, 700);
       processor.saveImage("step10-crop");
 
       // processor.sharpen();
@@ -30,12 +32,12 @@ public class Main {
       // processor.saveImage("step15-saturation");
 
       // 2. Kontrast
-      processor.contrastIt();
-      processor.saveImage("step20-contrast");
+      // processor.contrastIt();
+      // processor.saveImage("step20-contrast");
 
       // 3. Greyscale
-      processor.greyscaleIt();
-      processor.saveImage("step30-greyscale");
+      // processor.greyscaleIt();
+      // processor.saveImage("step30-greyscale");
 
       // 4. Analyze Line
       int line = 300;
